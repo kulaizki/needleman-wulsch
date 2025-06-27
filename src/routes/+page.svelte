@@ -2,10 +2,10 @@
   import { needlemanWunsch, type AlignmentResult } from '$lib/needlemanWunsch';
   
   let seq1 = $state('GATTACA');
-  let seq2 = $state('GCATGCU');
+  let seq2 = $state('GTCGACGCA');
   let matchScore = $state(1);
   let mismatchScore = $state(-1);
-  let gapScore = $state(-1);
+  let gapScore = $state(-2);
   
   let result = $state<AlignmentResult | null>(null);
   let hoveredCell = $state<[number, number] | null>(null);
@@ -30,16 +30,39 @@
     
     if (isOnPath) return 'bg-rose-500 text-white';
     if (isHovered) return 'bg-blue-200';
-    if (i === 0 || j === 0) return 'bg-gray-100 font-semibold';
     return 'hover:bg-gray-50';
   }
   
   function getCellValue(i: number, j: number): string {
     if (!result) return '';
+    return result.matrix[i][j].toString();
+  }
+  
+  function getCellHeader(i: number, j: number): string {
     if (i === 0 && j === 0) return '';
     if (i === 0 && j > 0) return seq2[j - 1];
     if (j === 0 && i > 0) return seq1[i - 1];
-    return result.matrix[i][j].toString();
+    return '';
+  }
+  
+  function getArrowDirection(i: number, j: number): string {
+    if (!result || i === 0 || j === 0) return '';
+    
+    // Check if this cell is on the traceback path
+    const isOnPath = result.traceback.some(([pi, pj]) => pi === i && pj === j);
+    if (!isOnPath) return '';
+    
+    // Find the next cell in the traceback path
+    const currentIndex = result.traceback.findIndex(([pi, pj]) => pi === i && pj === j);
+    if (currentIndex === -1 || currentIndex === 0) return '';
+    
+    const [nextI, nextJ] = result.traceback[currentIndex - 1];
+    
+    if (nextI === i - 1 && nextJ === j - 1) return '↖'; // diagonal
+    if (nextI === i - 1 && nextJ === j) return '↑'; // up
+    if (nextI === i && nextJ === j - 1) return '←'; // left
+    
+    return '';
   }
 </script>
 
@@ -159,7 +182,9 @@
             <div class="text-sm text-gray-600 space-y-1">
               <p>• Hover over matrix cells to explore values</p>
               <p>• Red cells show the optimal alignment path</p>
-              <p>• Gray cells represent sequence headers</p>
+              <p>• Blue cells represent sequence characters</p>
+              <p>• Arrows (↖ ↑ ←) indicate traceback direction</p>
+              <p>• Score in each cell shows the optimal alignment score up to that point</p>
             </div>
           </div>
         </div>
@@ -173,15 +198,51 @@
         <div class="overflow-x-auto">
           <table class="mx-auto border-collapse">
             <tbody>
-              {#each result.matrix as row, i}
+              <!-- Header row -->
+              <tr>
+                <td class="border border-gray-300 w-16 h-16 bg-gray-200"></td>
+                <td class="border border-gray-300 w-16 h-16 bg-gray-200"></td>
+                {#each seq2 as char}
+                  <td class="border border-gray-300 w-16 h-16 text-center bg-blue-500 text-white font-bold">
+                    {char}
+                  </td>
+                {/each}
+              </tr>
+              
+              <!-- First data row (with gap penalties) -->
+              <tr>
+                <td class="border border-gray-300 w-16 h-16 bg-gray-200"></td>
+                {#each result.matrix[0] as val, j}
+                  <td 
+                    class="border border-gray-300 w-16 h-16 text-center font-bold transition-all duration-200 cursor-pointer {getCellClass(0, j)}"
+                    onmouseenter={() => hoveredCell = [0, j]}
+                    onmouseleave={() => hoveredCell = null}
+                  >
+                    {val}
+                  </td>
+                {/each}
+              </tr>
+              
+              <!-- Remaining rows -->
+              {#each result.matrix.slice(1) as row, i}
                 <tr>
-                  {#each row as _, j}
+                  <td class="border border-gray-300 w-16 h-16 text-center bg-blue-500 text-white font-bold">
+                    {seq1[i]}
+                  </td>
+                  {#each row as val, j}
+                    {@const actualI = i + 1}
+                    {@const actualJ = j}
                     <td
-                      class="border border-gray-300 w-16 h-16 text-center transition-all duration-200 cursor-pointer {getCellClass(i, j)}"
-                      onmouseenter={() => hoveredCell = [i, j]}
+                      class="border border-gray-300 w-16 h-16 text-center transition-all duration-200 cursor-pointer relative {getCellClass(actualI, actualJ)}"
+                      onmouseenter={() => hoveredCell = [actualI, actualJ]}
                       onmouseleave={() => hoveredCell = null}
                     >
-                      {getCellValue(i, j)}
+                      <div class="flex flex-col items-center justify-center h-full">
+                        <span class="text-sm font-medium">{val}</span>
+                        {#if getArrowDirection(actualI, actualJ)}
+                          <span class="absolute top-1 left-1 text-xs">{getArrowDirection(actualI, actualJ)}</span>
+                        {/if}
+                      </div>
                     </td>
                   {/each}
                 </tr>
