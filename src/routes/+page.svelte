@@ -20,6 +20,16 @@
       gapScore
     });
     showAlignment = true;
+    
+    // Debug: log the traceback path
+    console.log('Traceback path:');
+    result.traceback.forEach(([i, j], index) => {
+      const char1 = i > 0 ? seq1[i-1] : '-';
+      const char2 = j > 0 ? seq2[j-1] : '-';
+      console.log(`Step ${index}: (${i},${j}) = ${result.matrix[i][j]} [${char1},${char2}]`);
+    });
+    console.log('Aligned seq1:', result.alignedSeq1);
+    console.log('Aligned seq2:', result.alignedSeq2);
   }
   
   function getCellClass(i: number, j: number): string {
@@ -27,6 +37,9 @@
     
     const isOnPath = result.traceback.some(([pi, pj]) => pi === i && pj === j);
     const isHovered = hoveredCell && hoveredCell[0] === i && hoveredCell[1] === j;
+    
+    // Special color for origin (0,0)
+    if (i === 0 && j === 0) return isOnPath ? 'bg-green-500 text-white font-bold' : 'bg-green-100';
     
     if (isOnPath) return 'bg-rose-500 text-white';
     if (isHovered) return 'bg-blue-200';
