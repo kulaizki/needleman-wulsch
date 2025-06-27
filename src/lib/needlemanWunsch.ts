@@ -100,9 +100,6 @@ export function needlemanWunsch({
         alignedSeq1 = '-' + alignedSeq1;
         alignedSeq2 = seq2[j - 1] + alignedSeq2;
         j--;
-      } else {
-        console.error('Traceback error: invalid direction at', i, j);
-        break;
       }
     }
   }

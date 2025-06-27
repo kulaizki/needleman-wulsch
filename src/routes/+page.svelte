@@ -20,16 +20,6 @@
       gapScore
     });
     showAlignment = true;
-    
-    // Debug: log the traceback path
-    console.log('Traceback path:');
-    result.traceback.forEach(([i, j], index) => {
-      const char1 = i > 0 ? seq1[i-1] : '-';
-      const char2 = j > 0 ? seq2[j-1] : '-';
-      console.log(`Step ${index}: (${i},${j}) = ${result.matrix[i][j]} [${char1},${char2}]`);
-    });
-    console.log('Aligned seq1:', result.alignedSeq1);
-    console.log('Aligned seq2:', result.alignedSeq2);
   }
   
   function getCellClass(i: number, j: number): string {
