@@ -303,17 +303,18 @@
       </div>
       
       <!-- Results Panel -->
-      {#if result && showAlignment}
-        <div class="glass-card rounded-2xl p-6 md:p-8 animate-slideUp border-slate-700/50 hover:border-sky-500/20 transition-all duration-300" style="animation-delay: 0.1s;">
-          <div class="flex items-center gap-4 mb-6 md:mb-8">
-            <div class="relative">
-              <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                <span class="text-white font-bold text-sm md:text-lg">02</span>
-              </div>
-              <div class="absolute inset-0 bg-emerald-500/20 rounded-xl blur-xl"></div>
+      <div class="glass-card rounded-2xl p-6 md:p-8 animate-slideUp border-slate-700/50 hover:border-sky-500/20 transition-all duration-300" style="animation-delay: 0.1s;">
+        <div class="flex items-center gap-4 mb-6 md:mb-8">
+          <div class="relative">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <span class="text-white font-bold text-sm md:text-lg">02</span>
             </div>
-            <h2 class="text-xl md:text-2xl font-bold text-slate-100">Alignment Result</h2>
+            <div class="absolute inset-0 bg-emerald-500/20 rounded-xl blur-xl"></div>
           </div>
+          <h2 class="text-xl md:text-2xl font-bold text-slate-100">Alignment Result</h2>
+        </div>
+        
+        {#if result && showAlignment}
           
           <div class="space-y-4 md:space-y-6">
             <!-- Aligned sequences -->
@@ -365,8 +366,42 @@
               </div>
             </div>
           </div>
-        </div>
-      {/if}
+        {:else}
+          <!-- Placeholder when no alignment has been run -->
+          <div class="space-y-6">
+            <div class="text-center py-8">
+              <div class="inline-flex items-center justify-center w-16 h-16 bg-slate-800/50 rounded-full mb-4 mx-auto">
+                <svg class="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-slate-400 mb-2">No Alignment Yet</h3>
+              <p class="text-sm text-slate-500 mb-6 max-w-xs mx-auto">
+                Enter your sequences and scoring parameters, then click "Run Alignment" to see results
+              </p>
+              
+              <!-- Example preview -->
+              <div class="bg-slate-800/30 rounded-xl p-4 border border-slate-700/30 max-w-sm mx-auto">
+                <p class="text-xs text-slate-500 mb-3 uppercase tracking-wider">Example Result Preview</p>
+                <div class="space-y-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 bg-sky-400/50 rounded-full animate-pulse"></div>
+                    <div class="h-2 bg-slate-700/50 rounded-full flex-1"></div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 bg-emerald-400/50 rounded-full animate-pulse" style="animation-delay: 0.2s;"></div>
+                    <div class="h-2 bg-slate-700/50 rounded-full flex-1"></div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 bg-purple-400/50 rounded-full animate-pulse" style="animation-delay: 0.4s;"></div>
+                    <div class="h-2 bg-slate-700/50 rounded-full w-3/4"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {/if}
+      </div>
     </div>
     
     <!-- Matrix visualization -->
