@@ -1,6 +1,6 @@
 # Needleman-Wunsch Algorithm Visualizer
 
-An interactive web-based visualization tool for the Needleman-Wunsch global sequence alignment algorithm, built with SvelteKit and TypeScript.
+An interactive web-based visualization tool for the Needleman-Wunsch global sequence alignment algorithm.
 
 🔗 **[Live Demo](https://neewunsch.vercel.app/)**
 
