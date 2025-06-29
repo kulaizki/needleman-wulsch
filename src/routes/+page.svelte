@@ -78,19 +78,34 @@
     return '';
   }
   
-  function getCellTooltip(i: number, j: number): string {
-    if (!result) return '';
+  function getCellTooltip(i: number, j: number): { html: string } | null {
+    if (!result) return null;
     
     if (i === 0 && j === 0) {
-      return 'Starting cell\nInitial score: 0';
+      return {
+        html: `<div class="space-y-1">
+          <div class="text-sky-300 font-bold">Starting cell</div>
+          <div>Initial score: <span class="text-emerald-400 font-bold">0</span></div>
+        </div>`
+      };
     }
     
     if (i === 0 && j > 0) {
-      return `Gap penalty accumulation\n${j} gaps × ${gapScore} = ${result.matrix[i][j]}`;
+      return {
+        html: `<div class="space-y-1">
+          <div class="text-sky-300 font-bold">Gap penalty accumulation</div>
+          <div><span class="text-slate-400">${j} gaps</span> × <span class="text-rose-400 font-bold">${gapScore}</span> = <span class="text-emerald-400 font-bold">${result.matrix[i][j]}</span></div>
+        </div>`
+      };
     }
     
     if (j === 0 && i > 0) {
-      return `Gap penalty accumulation\n${i} gaps × ${gapScore} = ${result.matrix[i][j]}`;
+      return {
+        html: `<div class="space-y-1">
+          <div class="text-sky-300 font-bold">Gap penalty accumulation</div>
+          <div><span class="text-slate-400">${i} gaps</span> × <span class="text-rose-400 font-bold">${gapScore}</span> = <span class="text-emerald-400 font-bold">${result.matrix[i][j]}</span></div>
+        </div>`
+      };
     }
     
     const diagonal = result.matrix[i - 1][j - 1];
@@ -100,7 +115,6 @@
     const char1 = seq1[i - 1];
     const char2 = seq2[j - 1];
     const isMatch = char1 === char2;
-    const scoreType = isMatch ? `Match (${char1} = ${char2})` : `Mismatch (${char1} ≠ ${char2})`;
     const scoreValue = isMatch ? matchScore : mismatchScore;
     
     const diagonalScore = diagonal + scoreValue;
@@ -108,11 +122,37 @@
     const leftScore = left + gapScore;
     
     const currentScore = result.matrix[i][j];
+    const maxScore = Math.max(diagonalScore, upScore, leftScore);
     
-    return `Diagonal cell: ${diagonal} + ${scoreValue} (${scoreType}) = ${diagonalScore}
-Upper cell: ${up} + ${gapScore} (Gap score) = ${upScore}
-Side cell: ${left} + ${gapScore} (Gap score) = ${leftScore}
-Winning (max) score is ${currentScore}`;
+    return {
+      html: `<div class="space-y-2">
+        <div class="${diagonalScore === maxScore ? 'ring-1 ring-emerald-400/50 bg-emerald-500/10 rounded p-1.5' : ''}">
+          <span class="text-sky-300 font-bold">Diagonal cell:</span> 
+          <span class="text-slate-400">${diagonal}</span> + 
+          <span class="${isMatch ? 'text-emerald-400' : 'text-amber-400'} font-bold">${scoreValue}</span>
+          <span class="text-slate-500">(${isMatch ? 'Match' : 'Mismatch'}: ${char1} ${isMatch ? '=' : '≠'} ${char2})</span> = 
+          <span class="${diagonalScore === maxScore ? 'text-emerald-400' : 'text-slate-400'} font-bold">${diagonalScore}</span>
+        </div>
+        <div class="${upScore === maxScore ? 'ring-1 ring-emerald-400/50 bg-emerald-500/10 rounded p-1.5' : ''}">
+          <span class="text-sky-300 font-bold">Upper cell:</span> 
+          <span class="text-slate-400">${up}</span> + 
+          <span class="text-rose-400 font-bold">${gapScore}</span>
+          <span class="text-slate-500">(Gap)</span> = 
+          <span class="${upScore === maxScore ? 'text-emerald-400' : 'text-slate-400'} font-bold">${upScore}</span>
+        </div>
+        <div class="${leftScore === maxScore ? 'ring-1 ring-emerald-400/50 bg-emerald-500/10 rounded p-1.5' : ''}">
+          <span class="text-sky-300 font-bold">Side cell:</span> 
+          <span class="text-slate-400">${left}</span> + 
+          <span class="text-rose-400 font-bold">${gapScore}</span>
+          <span class="text-slate-500">(Gap)</span> = 
+          <span class="${leftScore === maxScore ? 'text-emerald-400' : 'text-slate-400'} font-bold">${leftScore}</span>
+        </div>
+        <div class="border-t border-slate-700/50 pt-2 mt-2">
+          <span class="text-slate-400">Winning score:</span> 
+          <span class="text-emerald-400 font-bold text-lg">${currentScore}</span>
+        </div>
+      </div>`
+    };
   }
   
   function handleCellMouseEnter(e: MouseEvent, i: number, j: number) {
@@ -417,15 +457,20 @@ Winning (max) score is ${currentScore}`;
 
 <!-- Modern Tooltip -->
 {#if showTooltip && hoveredCell && result}
-  <div 
-    class="fixed z-50 glass-card text-xs md:text-sm rounded-xl py-3 px-4 md:py-4 md:px-5 pointer-events-none whitespace-pre-line shadow-2xl border border-sky-500/20 transition-opacity duration-150"
-    style="left: {tooltipPosition.x}px; top: {tooltipPosition.y}px; transform: translate(-50%, -100%); min-width: 280px; max-width: 340px; background: rgba(17, 17, 19, 0.95); color: #e2e8f0;"
-  >
-    <div class="font-medium leading-relaxed text-slate-200">{getCellTooltip(hoveredCell[0], hoveredCell[1])}</div>
-    <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full">
-      <div class="w-0 h-0 border-l-6 md:border-l-8 border-r-6 md:border-r-8 border-t-6 md:border-t-8 border-transparent" style="border-top-color: rgba(17, 17, 19, 0.95);"></div>
+  {@const tooltip = getCellTooltip(hoveredCell[0], hoveredCell[1])}
+  {#if tooltip}
+    <div 
+      class="fixed z-50 glass-card text-xs md:text-sm rounded-xl py-3 px-4 md:py-4 md:px-5 pointer-events-none shadow-2xl border border-sky-500/20 transition-opacity duration-150"
+      style="left: {tooltipPosition.x}px; top: {tooltipPosition.y}px; transform: translate(-50%, -100%); min-width: 300px; max-width: 360px; background: rgba(17, 17, 19, 0.98); color: #e2e8f0;"
+    >
+      <div class="font-medium leading-relaxed">
+        {@html tooltip.html}
+      </div>
+      <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full">
+        <div class="w-0 h-0 border-l-6 md:border-l-8 border-r-6 md:border-r-8 border-t-6 md:border-t-8 border-transparent" style="border-top-color: rgba(17, 17, 19, 0.98);"></div>
+      </div>
     </div>
-  </div>
+  {/if}
 {/if}
 
 <Footer />
