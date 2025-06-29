@@ -1,5 +1,6 @@
 <script lang="ts">
   import { needlemanWunsch, type AlignmentResult } from '$lib/needlemanWunsch';
+  import Footer from '$lib/components/Footer.svelte';
   
   let seq1 = $state('GATTACA');
   let seq2 = $state('GTCGACGCA');
@@ -108,9 +109,9 @@
     
     const currentScore = result.matrix[i][j];
     
-    return `Score from Diagonal cell: ${diagonal} + ${scoreValue} (${scoreType}) = ${diagonalScore}
-Score from Upper cell: ${up} + ${gapScore} (Gap score) = ${upScore}
-Score from Side cell: ${left} + ${gapScore} (Gap score) = ${leftScore}
+    return `Diagonal cell: ${diagonal} + ${scoreValue} (${scoreType}) = ${diagonalScore}
+Upper cell: ${up} + ${gapScore} (Gap score) = ${upScore}
+Side cell: ${left} + ${gapScore} (Gap score) = ${leftScore}
 Winning (max) score is ${currentScore}`;
   }
   
@@ -426,3 +427,5 @@ Winning (max) score is ${currentScore}`;
     </div>
   </div>
 {/if}
+
+<Footer />
