@@ -251,7 +251,7 @@ Winning (max) score is ${currentScore}`;
           <!-- Run button -->
           <button
             onclick={runAlignment}
-            class="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold py-3 px-5 md:py-4 md:px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-sky-500/25 flex items-center justify-center gap-3 text-base md:text-lg neon-button relative overflow-hidden"
+            class="hover:cursor-pointer w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold py-3 px-5 md:py-4 md:px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-sky-500/25 flex items-center justify-center gap-3 text-base md:text-lg neon-button relative overflow-hidden"
           >
             <span class="relative z-10">Run Alignment</span>
             <svg class="w-5 h-5 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
